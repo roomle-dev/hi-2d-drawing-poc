@@ -15,13 +15,16 @@ import {
 	Line,
 	LineBasicMaterial,
 	LineSegments,
+	Material,
 	MathUtils,
 	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
 	Object3D,
+	OrthographicCamera,
 	PerspectiveCamera,
 	Scene,
+	Shape,
 	Vector3,
 	WebGLRenderer
 } from 'three';
@@ -30,6 +33,7 @@ import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { SVGRenderer } from 'three/examples/jsm/renderers/SVGRenderer.js';
 
 ColorManagement.enabled = false;
 
@@ -112,6 +116,49 @@ export async function exportModel() {
 			return undefined;
 		}
 	);
+}
+
+export async function exportFloorPlan() {
+
+	const svgScene = scene.clone();
+	svgScene.traverse((node) => {
+		if (node instanceof Mesh) {
+			node.visible = false;
+		}
+	});
+
+	const sceneBox = new Box3().setFromObject(svgScene);
+	const width = sceneBox.max.x - sceneBox.min.x;
+	const height = sceneBox.max.z - sceneBox.min.z;
+	const depth = sceneBox.max.y - sceneBox.min.y;
+	console.log('Scene box', width, height, depth);
+	const orthoScale = 1.1;
+	const topCamera = new OrthographicCamera(
+		-width * orthoScale / 2,
+		width * orthoScale / 2,
+		height * orthoScale / 2,
+		-height * orthoScale / 2,
+		depth * orthoScale / 2,
+		-depth * orthoScale / 2,
+	);
+	const sceneCenter = new Vector3(
+		(sceneBox.min.x + sceneBox.max.x) / 2,
+		(sceneBox.min.y + sceneBox.max.y) / 2,
+		(sceneBox.min.z + sceneBox.max.z) / 2
+	);
+	topCamera.position.set(sceneCenter.x, sceneCenter.y, sceneCenter.z);
+	topCamera.rotateX(-Math.PI / 2);
+	topCamera.updateProjectionMatrix();
+	
+	const svgRenderer = new SVGRenderer();
+	svgRenderer.setSize(width, height);
+	svgRenderer.setQuality('low');
+	svgRenderer.setPrecision(0);
+	svgRenderer.domElement.innerHTML = '';
+	svgRenderer.render(svgScene, topCamera);
+
+	const svgData = svgRenderer.domElement.outerHTML;
+	return new Blob([svgData], { type: 'image/svg+xml' });
 }
 
 async function createPart(parent: Object3D, part: IVisualPart, showOpen: boolean, showDocking: boolean) {

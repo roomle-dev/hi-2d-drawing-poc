@@ -15,7 +15,7 @@ import {
 	IBomOrderLineDataJson,
 	IOrderData,
 } from './lib/internal/order_outputs';
-import { AssignParts, exportModel, IVisualPart, PartSpecialType } from './render';
+import { AssignParts, exportModel, exportFloorPlan, IVisualPart, PartSpecialType } from './render';
 import jsonUrl from './test-orders.json?url';
 import { BomOutputData, DisplaySettings, DisplaySettingsType, OutputData } from './types/custom-types';
 import { getSelectionsByAttrId } from './lib/internal/selections';
@@ -801,6 +801,19 @@ const onDownload3d = async (): Promise<void> => {
 	URL.revokeObjectURL(url);
 };
 
+const onDownload2d = async (): Promise<void> => {
+	const blob = await exportFloorPlan();
+	const url = URL.createObjectURL(blob!);
+	const anchorElement = document.createElement('a');
+	anchorElement.href = url;
+
+	anchorElement.download = 'scene.svg';
+
+	anchorElement.click();
+	anchorElement.remove();
+	URL.revokeObjectURL(url);
+};
+
 const onExecuteCheck = async (): Promise<void> => {
 	const dropdownValues = testGetDropDownCheckValues(firstModule);
 	populateCheckDropdown(dropdownValues);
@@ -1021,6 +1034,10 @@ document.getElementById('createOrderBomOutput')!.addEventListener('click', async
 
 document.getElementById('download3d')!.addEventListener('click', async () => {
 	await onDownload3d();
+});
+
+document.getElementById('download2d')!.addEventListener('click', async () => {
+	await onDownload2d();
 });
 
 document.getElementById('executeCheck')!.addEventListener('click', () => {
