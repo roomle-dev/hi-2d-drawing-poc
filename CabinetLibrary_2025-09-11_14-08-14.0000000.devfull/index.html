@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/x-icon" href="./src/favicon.ico" />
+    <link rel="stylesheet" href="./src/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TecConfig TEST</title>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 1st column -->
+        <div class="firstColumn">
+            <button id="calculate-btn"
+                    style="height: 60px; background-color: red; font-size: large">
+                CALCULATE
+            </button>
+            <label>
+                Test order:
+                <select id="testOrderCb">
+                </select>
+            </label>
+            <label id="calculate-status"> Calculate in progress... </label>
+        </div>
+        <div class="secondColumn">
+            <div>
+                <label>
+                    Select view:
+                    <select id="showBomCb">
+                    </select>
+                </label>
+                <br />
+                <label>
+                    Mode:
+                    <select id="manModeCb">
+                        <option value="">Neutral</option>
+                        <option value="man">Manufacturer</option>
+                    </select>
+                </label>
+                <br />
+                <label>
+                    <input id="showOpenCb"
+                           type="checkbox" />
+                    Show Open
+                </label>
+                <label>
+                    <input id="showDockingCb"
+                           type="checkbox" />
+                    Show Docking
+                </label>
+                <br />
+                <label>
+                    Ouput:
+                    <select id="bomOutputCb"></select>
+                    <button id="createBomOutput">Create output</button>
+                </label>
+                <br />
+                <label>
+                    Order output:
+                    <select id="bomOrderOutputCb"></select>
+                    <button id="createOrderBomOutput">Create order output</button>
+                </label>
+                <button id="download3d">Download 3d</button>
+                <br />
+                <div id="displaySettingsList"
+                     class="dropdown-check-list"
+                     tabindex="100">
+                    <span class="anchor">Display settings</span>
+                    <ul class="items">
+                        <li><input type="checkbox" id="display_articles" checked="true" />Articles</li>
+                        <li><input type="checkbox" id="display_touches" />Touches</li>
+                        <li><input type="checkbox" id="display_bom_after_touches" />BOMAfterTouches</li>
+                        <li><input type="checkbox" id="display_logs" />Logs</li>
+                        <li><input type="checkbox" id="display_attr_changes" />AttrChanges</li>
+                        <li><input type="checkbox" id="display_touches_logs" />TouchesLogs</li>
+                    </ul>
+                </div>
+                <br />
+                <br />
+                <button id="executeCheck">Check</button>
+                <select id="dropdownCheckList"></select>
+                <br />
+                <label>Checks conflicting changes calculator: </label><br />
+                <label>Module:</label><select id="conflictingChecksModuleList"></select><br />
+                <label>Attribute Id:</label><select id="conflictingChecksAttributeList"></select><br />
+                <label>Attribute value:</label><select id="conflictingChecksAttributeSelectionsList"></select><br />
+                <button id="calculateConflictingChecksButton">Calculate</button>
+                <p id="conflictingChecksResult"></p>
+                <br />
+            </div>
+        </div>
+        <div class="thirdColumn">
+            <p id="errorInfo"
+               style=" background-color: red; color: white"
+               [innerText]="errorInfo">
+            </p>
+        </div>
+
+
+        <div style="height: 100%">
+            <div id="inputEditor" class="json-editor">
+            </div>
+        </div>
+
+        <!-- 2nd column -->
+        <div style="height: 100%">
+            <div #divOutputEditor>
+                <div id="outputEditor"
+                     class="json-editor">
+                </div>
+            </div>
+            <div>
+                <table id="bomTable" class="bom"></table>
+            </div>
+        </div>
+
+        <!-- 3rd column -->
+        <div id="root3d"></div>
+
+        <script type="module" src="./src/main.ts"></script>
+</body>
+
+</html>

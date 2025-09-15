@@ -1,0 +1,63 @@
+{
+  // For more information, visit: https://go.microsoft.com/fwlink/?LinkId=733558
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "yarn run build",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "start",
+      "type": "shell",
+      "command": "yarn run start",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": [
+          {
+            "regexp": ".*",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "ready in .*ms"
+        }
+      }
+    },
+    {
+      "label": "build and start",
+      "dependsOn": [ "build", "start" ],
+      "dependsOrder": "sequence"
+    },
+    {
+      "label": "stop server",
+      "type": "shell",
+      "windows": {
+        "command": "taskkill",
+        "args": [ "/F", "/IM", "node.exe", "/T" ]
+      },
+      "linux": {
+        "command": "pkill",
+        "args": [ "-f", "node" ]
+      },
+      "group": "build",
+      "presentation": {
+        "echo": false,
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    }
+  ]
+}

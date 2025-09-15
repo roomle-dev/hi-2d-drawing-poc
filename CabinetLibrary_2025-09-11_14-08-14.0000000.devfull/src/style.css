@@ -1,0 +1,97 @@
+@import 'jsoneditor/dist/jsoneditor.min.css';
+
+.json-editor,
+.json-editor .jsoneditor,
+.json-editor>div,
+.json-editor jsoneditor-outer {
+    height: 100%;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    height: 100vh;
+    grid-template-rows: max-content;
+}
+
+.inputText {
+    flex: 1;
+}
+
+table.bom,
+td.bom-bom,
+td.bom-part {
+    border: 1px solid;
+}
+
+td.bom-part,
+td.bom-part {
+    background-color: aqua;
+}
+
+td.bom-bom,
+tr.bom-bom {
+    background-color: burlywood;
+}
+
+td.bom-level {
+    border: 0px;
+}
+
+.dropdown-check-list {
+    display: inline-block;
+}
+
+.dropdown-check-list .anchor {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+    padding: 5px 50px 5px 10px;
+    border: 1px solid #ccc;
+}
+
+.dropdown-check-list .anchor:after {
+    position: absolute;
+    content: '';
+    border-left: 2px solid black;
+    border-top: 2px solid black;
+    padding: 5px;
+    right: 10px;
+    top: 20%;
+    -moz-transform: rotate(-135deg);
+    -ms-transform: rotate(-135deg);
+    -o-transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+    transform: rotate(-135deg);
+}
+
+.dropdown-check-list .anchor:active:after {
+    right: 8px;
+    top: 21%;
+}
+
+.dropdown-check-list ul.items {
+    padding: 2px;
+    display: none;
+    margin: 0;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+.dropdown-check-list ul.items li {
+    list-style: none;
+}
+
+.dropdown-check-list.visible .items {
+    display: block;
+}
+
+.lable-hidden {
+    visibility: hidden;
+}
+
+.lable-visible {
+    visibility: visible;
+}
