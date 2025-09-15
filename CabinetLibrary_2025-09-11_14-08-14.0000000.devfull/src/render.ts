@@ -124,6 +124,10 @@ export async function exportFloorPlan() {
 	svgScene.traverse((node) => {
 		if (node instanceof Mesh) {
 			node.visible = false;
+		} else if (node instanceof Group) {
+			if (node.name.startsWith('part-Drilling')) {
+				node.visible = false;
+			}
 		}
 	});
 
@@ -131,7 +135,6 @@ export async function exportFloorPlan() {
 	const width = sceneBox.max.x - sceneBox.min.x;
 	const height = sceneBox.max.z - sceneBox.min.z;
 	const depth = sceneBox.max.y - sceneBox.min.y;
-	console.log('Scene box', width, height, depth);
 	const orthoScale = 1.1;
 	const topCamera = new OrthographicCamera(
 		-width * orthoScale / 2,
