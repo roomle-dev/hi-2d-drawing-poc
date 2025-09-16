@@ -1,14 +1,14 @@
 import { Box3, Camera, Group, Mesh, OrthographicCamera, Quaternion, Scene, Vector3 } from "three";
 import { SVGRenderer } from 'three/examples/jsm/renderers/SVGRenderer.js';
 
-export const renderSVG = (scene: Scene, camera: Camera, width: number, height: number): Blob => {
-    const svgRenderer = new SVGRenderer();
-    svgRenderer.setSize(width, height);
-    svgRenderer.setQuality('low');
-    svgRenderer.setPrecision(0);
-    svgRenderer.domElement.innerHTML = '';
-    svgRenderer.render(scene, camera);
-    const svgData = svgRenderer.domElement.outerHTML;
+export const renderSVG = (scene: Scene, camera: Camera, width: number, height: number, svgRenderer?: SVGRenderer): Blob => {
+    const renderer = svgRenderer ?? new SVGRenderer();
+    renderer.setSize(width, height);
+    renderer.setQuality('low');
+    renderer.setPrecision(0);
+    renderer.domElement.innerHTML = '';
+    renderer.render(scene, camera);
+    const svgData = renderer.domElement.outerHTML;
     return new Blob([svgData], { type: 'image/svg+xml' });
 }
 
