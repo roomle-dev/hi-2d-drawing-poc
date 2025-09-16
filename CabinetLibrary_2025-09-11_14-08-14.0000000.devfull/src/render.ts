@@ -120,7 +120,26 @@ export async function exportModel() {
 }
 
 export async function exportFloorPlan() {
-	const svgScene = newFloorPlanScene(scene);
+	//const svgScene = newFloorPlanScene(scene);
+	const svgScene = new Scene();
+	const mesh1 = new Mesh(new BoxGeometry(500, 500, 500), new MeshBasicMaterial({ color: new Color(0xff0000) }));
+	mesh1.position.set(0, 250, 0);
+	svgScene.add(mesh1);
+	const mesh2 = new Mesh(new BoxGeometry(500, 500, 400), new MeshBasicMaterial({ color: new Color(0x0000ff) }));
+	mesh2.position.set(600, 250, 0);
+	svgScene.add(mesh2);
+	const mesh3 = new Mesh(new BoxGeometry(400, 500, 500), new MeshBasicMaterial({ color: new Color(0xffff00) }));
+	mesh3.position.set(0, 250, 600);
+	svgScene.add(mesh3);
+	const mesh4 = new Mesh(new BoxGeometry(200, 200, 200), new MeshBasicMaterial({ color: new Color(0x00ff00) }));
+	mesh4.position.set(0, 1000, 0);
+	svgScene.add(mesh4);
+	const mesh5 = new Mesh(new BoxGeometry(200, 200, 200), new MeshBasicMaterial({ color: new Color(0xff7f00) }));
+	mesh5.position.set(600, 1000, 0);
+	svgScene.add(mesh5);
+	const mesh6 = new Mesh(new BoxGeometry(200, 200, 200), new MeshBasicMaterial({ color: new Color(0xff00ff) }));
+	mesh6.position.set(0, 1000, 600);
+	svgScene.add(mesh6);
 	const margin = 100;
 	const sceneBox = new Box3().setFromObject(svgScene);
 	const sceneSize = sceneBox.getSize(new Vector3()).addScalar(2 * margin);
