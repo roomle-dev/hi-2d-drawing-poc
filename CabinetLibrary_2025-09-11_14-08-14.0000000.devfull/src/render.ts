@@ -59,6 +59,8 @@ export interface IVisualPart {
 	_partId: string; // part id (part code)
     parentId?: string;
     _parentPartId?: string; // Is set for BOM/NC parts
+	_parentUniqueId?: string;
+	_groupRootId?: string;
 	_x: number;
 	_y: number;
 	_z: number;
@@ -310,9 +312,11 @@ async function createPart(parent: Object3D, part: IVisualPart, showOpen: boolean
 	}
 
 	if (part._3DElements) {
+		const subGrp = new Group();
+		parent.add(subGrp);
 		part._3DElements.forEach(element => {
         element._parentPartId = part._partId;
-			createPart(parent, element, showOpen, showDocking);
+			createPart(subGrp, element, showOpen, showDocking);
 		});
 	}
 }
@@ -412,9 +416,20 @@ export async function AssignParts(
 	lastHighlightIds = JSON.parse(JSON.stringify(highlightIds));
 
 	if (pas) {
+		const moduleGroupMap = new Map<string, Group>();
 		for (const part of pas) {
-			//place the parts which have no group assigned
-			await createPart(scene, part, showOpen, showDocking);
+			if (part._parentUniqueId) {
+				let moduleGrp = moduleGroupMap.get(part._parentUniqueId);
+				if (!moduleGrp) {
+					moduleGrp = new Group();
+					moduleGrp.name = 'module-' + part._parentUniqueId;
+					scene.add(moduleGrp);
+					moduleGroupMap.set(part._parentUniqueId, moduleGrp);
+				}
+				await createPart(moduleGrp, part, showOpen, showDocking);
+			} else {
+				await createPart(scene, part, showOpen, showDocking);
+			}
 		}
 	}
 
