@@ -15,7 +15,7 @@ import {
 	IBomOrderLineDataJson,
 	IOrderData,
 } from './lib/internal/order_outputs';
-import { AssignParts, exportModel, exportFloorPlan, IVisualPart, PartSpecialType } from './render';
+import { AssignParts, exportModel, exportPlans, IVisualPart, PartSpecialType } from './render';
 import jsonUrl from './test-orders.json?url';
 import { BomOutputData, DisplaySettings, DisplaySettingsType, OutputData } from './types/custom-types';
 import { getSelectionsByAttrId } from './lib/internal/selections';
@@ -802,16 +802,16 @@ const onDownload3d = async (): Promise<void> => {
 };
 
 const onDownload2d = async (): Promise<void> => {
-	const blob = await exportFloorPlan();
-	const url = URL.createObjectURL(blob!);
-	const anchorElement = document.createElement('a');
-	anchorElement.href = url;
-
-	anchorElement.download = 'scene.svg';
-
-	anchorElement.click();
-	anchorElement.remove();
-	URL.revokeObjectURL(url);
+	const exportedPlans = await exportPlans();
+	for (const exportedPlan of exportedPlans) {
+		const url = URL.createObjectURL(exportedPlan.blob!);
+		const anchorElement = document.createElement('a');
+		anchorElement.href = url;
+		anchorElement.download = `${exportedPlan.name}.svg`;
+		anchorElement.click();
+		anchorElement.remove();
+		URL.revokeObjectURL(url);
+	}
 };
 
 const onExecuteCheck = async (): Promise<void> => {

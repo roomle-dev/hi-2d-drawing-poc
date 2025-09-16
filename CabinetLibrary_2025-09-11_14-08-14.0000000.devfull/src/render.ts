@@ -119,15 +119,37 @@ export async function exportModel() {
 	);
 }
 
-export async function exportFloorPlan() {
+export interface PlanExport {
+	name: string;
+	blob: Blob;
+}
+
+export async function exportPlans(): Promise<PlanExport[]> {
 	const svgScene = newFloorPlanScene(scene);
 	const margin = 100;
 	const sceneBox = new Box3().setFromObject(svgScene);
 	const sceneSize = sceneBox.getSize(new Vector3()).addScalar(2 * margin);
 	const floorPlanOrientation = new Quaternion()
-		.setFromAxisAngle(new Vector3(1, 0, 0), MathUtils.degToRad(-90));
+		.setFromAxisAngle(new Vector3(1, 0, 0), MathUtils.degToRad(-90));	
 	const floorPlanCamera = newPlanCamera(floorPlanOrientation, sceneBox, margin);
-	return renderSVG(svgScene, floorPlanCamera, sceneSize.x, sceneSize.z);
+	const elevationCamera = newPlanCamera(new Quaternion(), sceneBox, margin);
+	const sideElevationOrientation = new Quaternion()
+		.setFromAxisAngle(new Vector3(0, 1, 0), MathUtils.degToRad(90));	
+	const sideElevationCamera = newPlanCamera(sideElevationOrientation, sceneBox, margin);
+	return [ 
+		{
+			'name': 'floor-plan',
+			'blob': renderSVG(svgScene, floorPlanCamera, sceneSize.x, sceneSize.z),
+		},
+		{
+			'name': 'elevation',
+			'blob': renderSVG(svgScene, elevationCamera, sceneSize.x, sceneSize.y),
+		},
+		{
+			'name': 'side-elevation',
+			'blob': renderSVG(svgScene, sideElevationCamera, sceneSize.z, sceneSize.y),
+		},
+	];
 }
 
 async function createPart(parent: Object3D, part: IVisualPart, showOpen: boolean, showDocking: boolean) {
