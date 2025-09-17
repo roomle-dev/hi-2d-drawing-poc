@@ -1,5 +1,5 @@
 import { logError } from './lib/internal/logging';
-import { newFloorPlanScene, newPlanCamera, renderSVG } from './drawing/render-svg';
+import { addWallGeometryToScene, newFloorPlanScene, newPlanCamera, renderSVG, setPositionOfPosGroup } from './drawing/render-svg';
 import {
 	ArrowHelper,
 	AxesHelper,
@@ -412,9 +412,12 @@ export async function AssignParts(
 	lastHighlightIds = JSON.parse(JSON.stringify(highlightIds));
 
 	if (pas) {
+		const posGroup = new Group();
+		posGroup.name = 'pos-group';
+		scene.add(posGroup);
 		for (const part of pas) {
 			//place the parts which have no group assigned
-			await createPart(scene, part, showOpen, showDocking);
+			await createPart(posGroup, part, showOpen, showDocking);
 		}
 	}
 
