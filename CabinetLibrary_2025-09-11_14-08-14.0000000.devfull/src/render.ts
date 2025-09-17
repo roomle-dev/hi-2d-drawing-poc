@@ -146,7 +146,7 @@ export async function exportPlans(): Promise<PlanExport[]> {
 	hideAllOtherWallSegments(svgScene, wallsSegmentsAroundGroup);
 	for (let segmentIndex = 0; segmentIndex < wallsSegmentsAroundGroup.length; segmentIndex++) {
 		const wallSegment = wallsSegmentsAroundGroup[segmentIndex];
-		const rotationY = (-wallSegment.rotationY - Math.PI / 2) % (2 * Math.PI);
+		const rotationY = (wallSegment.rotationY + Math.PI / 2) % (2 * Math.PI);
 		const elevationOrientation = new Quaternion()
 			.setFromAxisAngle(new Vector3(0, 1, 0), rotationY);
 		const elevationCamera = newPlanCamera(elevationOrientation, sceneBox, margin);
