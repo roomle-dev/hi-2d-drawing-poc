@@ -1,0 +1,52 @@
+[
+  {
+    "level": 0,
+    "segments": [
+      {
+        "angle": null,
+        "cmd": "M",
+        "height": null,
+        "thickness": null,
+        "type": null,
+        "x": 4815,
+        "y": 1235
+      },
+      {
+        "angle": null,
+        "cmd": "L",
+        "height": 2800,
+        "thickness": 120,
+        "type": "wall",
+        "x": 4815,
+        "y": -3765
+      },
+      {
+        "angle": null,
+        "cmd": "L",
+        "height": 2800,
+        "thickness": 120,
+        "type": "wall",
+        "x": -685,
+        "y": -3765
+      },
+      {
+        "angle": null,
+        "cmd": "L",
+        "height": 2800,
+        "thickness": 120,
+        "type": "wall",
+        "x": -685,
+        "y": 1235
+      },
+      {
+        "angle": null,
+        "cmd": "L",
+        "height": 2800,
+        "thickness": 120,
+        "type": "wall",
+        "x": 4815,
+        "y": 1235
+      }
+    ]
+  }
+]

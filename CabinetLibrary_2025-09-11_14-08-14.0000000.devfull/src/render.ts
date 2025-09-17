@@ -1,5 +1,5 @@
 import { logError } from './lib/internal/logging';
-import { newFloorPlanScene, newPlanCamera, renderSVG } from './drawing/render-svg';
+import { findWallSegmentsAroundGroup, hideAllOtherWallSegments, newFloorPlanScene, newPlanCamera, renderSVG } from './drawing/render-svg';
 import {
 	ArrowHelper,
 	AxesHelper,
@@ -132,24 +132,31 @@ export async function exportPlans(): Promise<PlanExport[]> {
 	const floorPlanOrientation = new Quaternion()
 		.setFromAxisAngle(new Vector3(1, 0, 0), MathUtils.degToRad(-90));	
 	const floorPlanCamera = newPlanCamera(floorPlanOrientation, sceneBox, margin);
-	const elevationCamera = newPlanCamera(new Quaternion(), sceneBox, margin);
-	const sideElevationOrientation = new Quaternion()
-		.setFromAxisAngle(new Vector3(0, 1, 0), MathUtils.degToRad(90));	
-	const sideElevationCamera = newPlanCamera(sideElevationOrientation, sceneBox, margin);
-	return [ 
-		{
-			'name': 'floor-plan',
-			'blob': renderSVG(svgScene, floorPlanCamera, sceneSize.x, sceneSize.z),
-		},
-		{
-			'name': 'elevation',
-			'blob': renderSVG(svgScene, elevationCamera, sceneSize.x, sceneSize.y),
-		},
-		{
-			'name': 'side-elevation',
-			'blob': renderSVG(svgScene, sideElevationCamera, sceneSize.z, sceneSize.y),
-		},
-	];
+
+	const plans: PlanExport[] = [];
+	plans.push({
+		'name': 'floor-plan',
+		'blob': renderSVG(svgScene, floorPlanCamera, sceneSize.x, sceneSize.z),
+	});
+
+	const wallsSegmentsAroundGroup = findWallSegmentsAroundGroup(svgScene);
+	if (!wallsSegmentsAroundGroup) {
+		return plans;
+	}
+	hideAllOtherWallSegments(svgScene, wallsSegmentsAroundGroup);
+	for (let segmentIndex = 0; segmentIndex < wallsSegmentsAroundGroup.length; segmentIndex++) {
+		const wallSegment = wallsSegmentsAroundGroup[segmentIndex];
+		const rotationY = (-wallSegment.rotationY - Math.PI / 2) % (2 * Math.PI);
+		const elevationOrientation = new Quaternion()
+			.setFromAxisAngle(new Vector3(0, 1, 0), rotationY);
+		const elevationCamera = newPlanCamera(elevationOrientation, sceneBox, margin);
+		const sizeVector = new Vector3(sceneSize.x, 0, sceneSize.z).applyQuaternion(elevationOrientation);
+		plans.push({
+			'name': `elevation-${segmentIndex}`,
+			'blob': renderSVG(svgScene, elevationCamera, Math.abs(sizeVector.x), sceneSize.y),
+		});
+	}
+	return plans;
 }
 
 async function createPart(parent: Object3D, part: IVisualPart, showOpen: boolean, showDocking: boolean) {
@@ -412,9 +419,12 @@ export async function AssignParts(
 	lastHighlightIds = JSON.parse(JSON.stringify(highlightIds));
 
 	if (pas) {
+		const posGroup = new Group();
+		posGroup.name = 'pos-group';
+		scene.add(posGroup);
 		for (const part of pas) {
 			//place the parts which have no group assigned
-			await createPart(scene, part, showOpen, showDocking);
+			await createPart(posGroup, part, showOpen, showDocking);
 		}
 	}
 
