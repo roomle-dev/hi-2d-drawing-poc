@@ -1,4 +1,4 @@
-import { Box3, BoxGeometry, Camera, EdgesGeometry, Group, LineBasicMaterial, LineSegments, MathUtils, Mesh, MeshBasicMaterial, OrthographicCamera, Quaternion, Scene, Vector3 } from "three";
+import { Box3, BoxGeometry, Camera, EdgesGeometry, Group, LineBasicMaterial, LineSegments, MathUtils, Mesh, MeshBasicMaterial, Object3D, OrthographicCamera, Quaternion, Raycaster, Scene, Vector3 } from "three";
 import { SVGRenderer } from 'three/examples/jsm/renderers/SVGRenderer.js';
 import room from './room.json';
 
@@ -104,6 +104,7 @@ export const addWallGeometryToScene = (scene: Scene): void => {
 }
 
 export class WallSegment extends Group {
+    public segmentStart: Vector3;
     public direction: Vector3;
     public wallLength: number;
     public rotationY: number;
@@ -113,14 +114,14 @@ export class WallSegment extends Group {
         super();
         const thickness = to.thickness ?? 120;
         const height = to.height ?? 2800;
-        const segmentStart = new Vector3(from.x, 0, from.y);
+        this.segmentStart = new Vector3(from.x, 0, from.y);
         const segmentEnd = new Vector3(to.x, 0, to.y);
-        this.direction = new Vector3().subVectors(segmentEnd, segmentStart);
+        this.direction = new Vector3().subVectors(segmentEnd, this.segmentStart);
         this.wallLength = this.direction.length();  
         this.direction.normalize();
         this.rotationY = Math.atan2(this.direction.z, this.direction.x);
         this.normalToWall = new Vector3(-this.direction.z, 0, this.direction.x);
-        this._createGeometry(segmentStart, segmentEnd, height, thickness);
+        this._createGeometry(this.segmentStart, segmentEnd, height, thickness);
     }
 
     private _createGeometry(segmentStart: Vector3, segmentEnd: Vector3, height: number, thickness: number): void {
@@ -138,4 +139,47 @@ export class WallSegment extends Group {
         const wireframe = new LineSegments(edgeGeometry, new LineBasicMaterial({ color: 0x000000, linewidth: 1 }));
         this.add(wireframe);
     }
+
+    public isCloseTo(node: Object3D, distance: number): boolean {
+        const rayStart = this.segmentStart.clone()
+            .addScaledVector(this.normalToWall, -distance);
+        rayStart.y = 500;
+        const rayCaster = new Raycaster(rayStart, this.direction, 0, this.wallLength);
+        return rayCaster.intersectObject(node, true).length > 0;
+    }
+}
+
+export const findWallSegmentsAroundGroup = (scene: Scene): WallSegment[] | null => {
+    const wallGroup = scene.getObjectByName('walls');
+    if (!wallGroup) {
+        return null;
+    }
+    const posGroup = scene.getObjectByName('pos-group');
+    if (!posGroup) {
+        return null;
+    }
+
+    const wallSegments: WallSegment[] = [];
+    wallGroup.traverse((child) => {
+        if (child instanceof WallSegment) {
+            if (child.isCloseTo(posGroup, 300)) {
+                wallSegments.push(child);
+            }
+        }
+    });
+    return wallSegments;
+}
+
+export const hideAllOtherWallSegments = (scene: Scene, wallSegmentsToBeExcluded: WallSegment[]): void => {
+    const wallGroup = scene.getObjectByName('walls');
+    if (!wallGroup) {
+        return;
+    }
+    wallGroup.traverse((node) => {
+        if (node instanceof WallSegment) {
+            if (wallSegmentsToBeExcluded.indexOf(node) === -1) {
+                node.visible = false;
+            }     
+        }
+    });
 }
