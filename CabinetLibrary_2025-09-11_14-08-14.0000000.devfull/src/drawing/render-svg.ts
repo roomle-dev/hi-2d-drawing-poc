@@ -1,6 +1,7 @@
 import { Box3, BoxGeometry, Camera, EdgesGeometry, Group, LineBasicMaterial, LineSegments, MathUtils, Mesh, MeshBasicMaterial, Object3D, OrthographicCamera, Quaternion, Raycaster, Scene, Vector3 } from "three";
 import { SVGRenderer } from 'three/examples/jsm/renderers/SVGRenderer.js';
 import room from './room.json';
+import { optimize } from 'svgo';
 
 export interface PosContourSegment {
   angle?: number | null;
@@ -17,7 +18,7 @@ export interface PosContour {
   segments: PosContourSegment[];
 }
 
-export const renderSVG = (scene: Scene, camera: Camera, width: number, height: number, svgRenderer?: SVGRenderer): Blob => {
+export const renderSVG = async (scene: Scene, camera: Camera, width: number, height: number, svgRenderer?: SVGRenderer): Promise<Blob> => {
     const renderer = svgRenderer ?? new SVGRenderer();
     renderer.setSize(width, height);
     renderer.setQuality('low');
@@ -26,7 +27,14 @@ export const renderSVG = (scene: Scene, camera: Camera, width: number, height: n
     renderer.domElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     renderer.domElement.innerHTML = '';
     renderer.render(scene, camera);
-    const svgData = renderer.domElement.outerHTML;
+    let svgData = renderer.domElement.outerHTML;
+    const svgOptimizeResult = await optimize(svgData, {
+        multipass: true,
+        floatPrecision: 0
+    });
+    if (svgOptimizeResult.data) {
+        svgData = svgOptimizeResult.data;
+    }
     return new Blob([svgData], { type: 'image/svg+xml' });
 }
 

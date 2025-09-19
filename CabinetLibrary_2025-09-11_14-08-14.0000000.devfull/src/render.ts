@@ -136,7 +136,7 @@ export async function exportPlans(): Promise<PlanExport[]> {
 	const plans: PlanExport[] = [];
 	plans.push({
 		'name': 'floor-plan',
-		'blob': renderSVG(svgScene, floorPlanCamera, sceneSize.x, sceneSize.z),
+		'blob': await renderSVG(svgScene, floorPlanCamera, sceneSize.x, sceneSize.z),
 	});
 
 	const wallsSegmentsAroundGroup = findWallSegmentsAroundGroup(svgScene);
@@ -153,7 +153,7 @@ export async function exportPlans(): Promise<PlanExport[]> {
 		const sizeVector = new Vector3(sceneSize.x, 0, sceneSize.z).applyQuaternion(elevationOrientation);
 		plans.push({
 			'name': `elevation-${segmentIndex}`,
-			'blob': renderSVG(svgScene, elevationCamera, Math.abs(sizeVector.x), sceneSize.y),
+			'blob': await renderSVG(svgScene, elevationCamera, Math.abs(sizeVector.x), sceneSize.y),
 		});
 	}
 	return plans;
